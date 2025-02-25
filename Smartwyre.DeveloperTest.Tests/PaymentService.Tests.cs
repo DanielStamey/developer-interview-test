@@ -3,11 +3,14 @@ using Smartwyre.DeveloperTest.Services;
 using Smartwyre.DeveloperTest.Types;
 using Moq;
 using Smartwyre.DeveloperTest.Data;
+using Smartwyre.DeveloperTest.Factories;
 
 namespace Smartwyre.DeveloperTest.Tests;
 
 public class PaymentServiceTests
 {
+    Mock<IIncentiveStrategyFactory> _factory;
+
     CalculateRebateRequest calculateRebateRequest = new CalculateRebateRequest()
     {
       ProductIdentifier = "ProductIdentifier",
@@ -29,6 +32,14 @@ public class PaymentServiceTests
       Uom = "Each",
       SupportedIncentives = SupportedIncentiveType.FixedCashAmount,
     };
+
+    public PaymentServiceTests()
+    {
+      _factory = new Mock<IIncentiveStrategyFactory>();
+      _factory.Setup(m => m.GetIncentiveStrategy("FixedCashAmount")).Returns(new FixedCashAmount());
+      _factory.Setup(m => m.GetIncentiveStrategy("FixedRateRebate")).Returns(new FixedRateRebate());
+      _factory.Setup(m => m.GetIncentiveStrategy("AmountPerUom")).Returns(new AmountPerUom());
+    }
 
     [Theory]
     [InlineData(IncentiveType.FixedCashAmount, 10, 5, 3, 2, 10, SupportedIncentiveType.FixedCashAmount)]
@@ -55,7 +66,7 @@ public class PaymentServiceTests
       var mockProductDataStore = new Mock<IProductDataStore>();
       mockProductDataStore.Setup(x => x.GetProduct(product.Identifier)).Returns(product);
 
-      RebateService rebateService = new RebateService(mockRebateDataStore.Object, mockProductDataStore.Object);
+      RebateService rebateService = new RebateService(mockRebateDataStore.Object, mockProductDataStore.Object, _factory.Object);
 
       var result = rebateService.Calculate(calculateRebateRequest);
 
@@ -93,7 +104,7 @@ public class PaymentServiceTests
       var mockProductDataStore = new Mock<IProductDataStore>();
       mockProductDataStore.Setup(x => x.GetProduct(product.Identifier)).Returns(product);
 
-      RebateService rebateService = new RebateService(mockRebateDataStore.Object, mockProductDataStore.Object);
+      RebateService rebateService = new RebateService(mockRebateDataStore.Object, mockProductDataStore.Object, _factory.Object);
 
       var result = rebateService.Calculate(calculateRebateRequest);
 
@@ -112,7 +123,7 @@ public class PaymentServiceTests
       var mockProductDataStore = new Mock<IProductDataStore>();
       mockProductDataStore.Setup(x => x.GetProduct(product.Identifier)).Returns(product);
 
-      RebateService rebateService = new RebateService(mockRebateDataStore.Object, mockProductDataStore.Object);
+      RebateService rebateService = new RebateService(mockRebateDataStore.Object, mockProductDataStore.Object, _factory.Object);
 
       var result = rebateService.Calculate(calculateRebateRequest);
 
@@ -131,7 +142,7 @@ public class PaymentServiceTests
       var mockProductDataStore = new Mock<IProductDataStore>();
       mockProductDataStore.Setup(x => x.GetProduct(product.Identifier)).Returns<Product>(null);
 
-      RebateService rebateService = new RebateService(mockRebateDataStore.Object, mockProductDataStore.Object);
+      RebateService rebateService = new RebateService(mockRebateDataStore.Object, mockProductDataStore.Object, _factory.Object);
 
       var result = rebateService.Calculate(calculateRebateRequest);
 
