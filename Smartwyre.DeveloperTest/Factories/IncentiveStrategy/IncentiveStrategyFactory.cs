@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Smartwyre.DeveloperTest.Factories;
 
-public class IncentiveStrategyFactory
+public class IncentiveStrategyFactory : IIncentiveStrategyFactory
 {
     private readonly Dictionary<string, Func<IIncentiveStrategy>> _incentiveStrategyCreators;
 
