@@ -25,14 +25,16 @@ public class RebateService : IRebateService
 
         var rebateAmount = 0m;
 
+        if (rebate == null || product == null)
+        {
+            result.Success = false;
+            return result;
+        }
+
         switch (rebate.Incentive)
         {
             case IncentiveType.FixedCashAmount:
-                if (rebate == null)
-                {
-                    result.Success = false;
-                }
-                else if (!product.SupportedIncentives.HasFlag(SupportedIncentiveType.FixedCashAmount))
+                if (!product.SupportedIncentives.HasFlag(SupportedIncentiveType.FixedCashAmount))
                 {
                     result.Success = false;
                 }
@@ -48,15 +50,7 @@ public class RebateService : IRebateService
                 break;
 
             case IncentiveType.FixedRateRebate:
-                if (rebate == null)
-                {
-                    result.Success = false;
-                }
-                else if (product == null)
-                {
-                    result.Success = false;
-                }
-                else if (!product.SupportedIncentives.HasFlag(SupportedIncentiveType.FixedRateRebate))
+                if (!product.SupportedIncentives.HasFlag(SupportedIncentiveType.FixedRateRebate))
                 {
                     result.Success = false;
                 }
@@ -72,15 +66,7 @@ public class RebateService : IRebateService
                 break;
 
             case IncentiveType.AmountPerUom:
-                if (rebate == null)
-                {
-                    result.Success = false;
-                }
-                else if (product == null)
-                {
-                    result.Success = false;
-                }
-                else if (!product.SupportedIncentives.HasFlag(SupportedIncentiveType.AmountPerUom))
+                if (!product.SupportedIncentives.HasFlag(SupportedIncentiveType.AmountPerUom))
                 {
                     result.Success = false;
                 }
